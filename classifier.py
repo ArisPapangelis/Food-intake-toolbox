@@ -73,6 +73,7 @@ df['BMI'] = Y
 df.iloc[:,:-1] = X_rescaled
 
 cor = df.corr()
+plt.figure(figsize=(19.2, 10.8))
 sns.heatmap(cor, annot=True, cmap=plt.cm.Reds)
 
 plt.figure(figsize=(19.2, 10.8))
@@ -86,7 +87,7 @@ for col in df.columns[:-1]:
     
 """
 #Select best features through SelectKBest
-features = SelectKBest(score_func=f_classif, k=4)
+features = SelectKBest(score_func=f_classif, k=3)
 fit = features.fit(X_rescaled, Y)
 print(fit.scores_)
 X_rescaled = fit.transform(X_rescaled)
@@ -95,7 +96,7 @@ X_rescaled = fit.transform(X_rescaled)
 
 #Select best features through RFE
 model = ExtraTreesClassifier(random_state=0)
-rfe = RFE(model, 4)
+rfe = RFE(model, 3)
 fit = rfe.fit(X_rescaled, Y)
 print("Num Features: %d" % fit.n_features_)
 print("Selected Features: %s" % fit.support_)
@@ -112,10 +113,11 @@ print("Explained Variance: %s" % fit.explained_variance_ratio_)
 print(fit.components_)
 """
 
-"""
+
 #Classification
 x_train, x_test, y_train, y_test = train_test_split(X_rescaled, Y, test_size=0.2, random_state=0)
-model = RandomForestClassifier(random_state=0).fit(x_train, y_train)
+#model = RandomForestClassifier(random_state=0).fit(x_train, y_train)
+model = ExtraTreesClassifier(random_state=0).fit(x_train, y_train)
 #model = KNeighborsClassifier(n_neighbors=3).fit(x_train, y_train)
 #model = DecisionTreeClassifier(random_state=0).fit(x_train, y_train)
 #model = GaussianNB().fit(x_train, y_train)
@@ -124,7 +126,7 @@ acc = accuracy_score(y_test, y_pred)
 report = classification_report(y_test,y_pred)
 cm = confusion_matrix(y_test,y_pred)
 ROC = roc_auc_score(y_test, y_pred)
-"""
+
 
 #Check Algorithms
 #Decision tree has high recall and f1, random forest has balance between recall and accuracy, as well as best roc_auc
@@ -150,12 +152,3 @@ for name, model in models:
     names.append(name)
     print('%s: %f (%f)' % (name, cv_results.mean(), cv_results.std()))
 
-
-
-
-"""
-#0 for underweight, 1 for normal, 2 for obese
-Y_classifier = Y.where(Y>=18.5, 0)
-Y_classifier = Y_classifier.where((Y_classifier < 18.5) | (Y_classifier > 30), 1)
-Y_classifier = Y_classifier.where(Y_classifier<=30, 2)
-"""

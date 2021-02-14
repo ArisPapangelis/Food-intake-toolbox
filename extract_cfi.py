@@ -229,5 +229,5 @@ def extract_cfi(folder, file, initial_sampling_rate, end_of_meal, stable_secs):
 
 
 if __name__=="__main__":
-    extract_cfi("clemson_data", 'p010_c1', 15, True, 1)
-    #extract_cfi("data_katerinas", str(22), 10, True, 1)
+    extract_cfi("clemson_data", 'p011_c1', 15, True, 1)
+    #extract_cfi("data_katerinas", str(1), 10, True, 1)
