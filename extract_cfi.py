@@ -218,16 +218,16 @@ def extract_cfi(folder, file, initial_sampling_rate, end_of_meal, stable_secs):
     plt.scatter((bite_indices + int(index_offset)) / downsampled_rate, cfi_raw[bite_indices + int(index_offset)], label = 'Detected bites', c = 'tab:orange')
     plt.legend()
     plt.savefig(folder + "/pics/" + file +".png")
-    #plt.show()
-    plt.close(file)
+    plt.show()
+    #plt.close(file)
 
 
-    
+    #results = np.array([a, b, total_food_intake, average_food_intake_rate, average_bite_size, bite_size_STD, bite_frequency])
     return a, b, total_food_intake, average_food_intake_rate, average_bite_size, bite_size_STD, bite_frequency
 
 
 
 
 if __name__=="__main__":
-    extract_cfi("clemson_data", 'p011_c1', 15, True, 1)
-    #extract_cfi("data_katerinas", str(1), 10, True, 1)
+    #extract_cfi("clemson_data", 'p011_c1', 15, True, 1)
+    extract_cfi("data_katerinas", str(1), 10, True, 1)
