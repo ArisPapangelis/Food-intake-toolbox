@@ -150,6 +150,7 @@ def extract_cfi(folder, file, initial_sampling_rate, end_of_meal, stable_secs):
     #Start and end of meal
     cfi = cfi[ranges[0,0]:ranges[len(ranges)-1,1]]
     time = time[ranges[0,0]:ranges[len(ranges)-1,1]]
+
     if end_of_meal == True:
         print(file)
         indices = np.where(np.diff(cfi)!=0)[0]
@@ -160,6 +161,39 @@ def extract_cfi(folder, file, initial_sampling_rate, end_of_meal, stable_secs):
             end = endIndex + 20 if endIndex + 20 < len(cfi) else endIndex + 10
             cfi = cfi[start:end]
             time = time[start:end]
+    
+    
+    #Experimentation with plate weight for training mode
+    plate_weight = 559 #1
+    #plate_weight = 652.1 #2
+    #"""
+    if plate_weight > 5:
+        end_weight = cfi[0] - plate_weight
+        reference_coeff = [-0.0005, 1, -end_weight]
+        roots = np.roots(reference_coeff)
+        if np.isreal(roots[0]) and np.isreal(roots[1]): 
+            candidate_times = np.real(min(roots))
+        else:
+            candidate_times = np.real(np.sqrt(roots[0]*roots[1]))
+        reference_time = np.arange(0, candidate_times, 1/5)
+        reference_curve = reference_coeff[0] * reference_time ** 2 + reference_coeff[1] * reference_time
+        plt.plot(reference_time, reference_curve, label= "Reference curve with roots")
+    #"""  
+    #"""
+    if plate_weight > 5:
+        end_weight = cfi[0] - plate_weight
+        #reference_coeff = [-0.0005, 1, -end_weight]
+        time_to_finish = end_weight / 0.8
+        reference_time = np.arange(0, time_to_finish, 1/5)
+        reference_weight = np.linspace(0, end_weight, num = len(reference_time))
+        #reference_time = np.array([0, time_to_finish])
+        #reference_weight = np.array([0, end_weight])
+        reference_coeff = curve_fit(fit_func, reference_time, reference_weight,
+                                    bounds = ([-1, 0], [-0.0005, 2]))[0]
+        reference_curve = reference_coeff[0] * reference_time ** 2 + reference_coeff[1] * reference_time
+        plt.plot(reference_time, reference_curve, label= "Reference curve with curve fit")
+    #"""
+    
     
     #"""
     index_offset = time[0] * downsampled_rate
