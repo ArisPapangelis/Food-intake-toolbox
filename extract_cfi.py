@@ -164,17 +164,20 @@ def extract_cfi(folder, file, initial_sampling_rate, end_of_meal, stable_secs):
     
     
     #Experimentation with plate weight for training mode
-    plate_weight = 559 #1
-    #plate_weight = 652.1 #2
+    plate_weight_array=[559.8,652.1,394.6,481.6,481.6,559.8,409.1,559.8,652.1,409.1,453.5,559.8,345.6,409.1,397,409.1,487,481.6,559.8,559.8,559.8,559.8,559.8,400.2,559.8,652.1,559.8,409.1];
+    plate_weight = plate_weight_array[int(file)-1]
     #"""
     if plate_weight > 5:
         end_weight = cfi[0] - plate_weight
+        
         reference_coeff = [-0.0005, 1, -end_weight]
+        
         roots = np.roots(reference_coeff)
         if np.isreal(roots[0]) and np.isreal(roots[1]): 
             candidate_times = np.real(min(roots))
         else:
-            candidate_times = np.real(np.sqrt(roots[0]*roots[1]))
+            candidate_times = np.real(np.min(roots))
+        
         reference_time = np.arange(0, candidate_times, 1/5)
         reference_curve = reference_coeff[0] * reference_time ** 2 + reference_coeff[1] * reference_time
         plt.plot(reference_time, reference_curve, label= "Reference curve with roots")
@@ -182,12 +185,11 @@ def extract_cfi(folder, file, initial_sampling_rate, end_of_meal, stable_secs):
     #"""
     if plate_weight > 5:
         end_weight = cfi[0] - plate_weight
-        #reference_coeff = [-0.0005, 1, -end_weight]
+        
         time_to_finish = end_weight / 0.8
+        
         reference_time = np.arange(0, time_to_finish, 1/5)
         reference_weight = np.linspace(0, end_weight, num = len(reference_time))
-        #reference_time = np.array([0, time_to_finish])
-        #reference_weight = np.array([0, end_weight])
         reference_coeff = curve_fit(fit_func, reference_time, reference_weight,
                                     bounds = ([-1, 0], [-0.0005, 2]))[0]
         reference_curve = reference_coeff[0] * reference_time ** 2 + reference_coeff[1] * reference_time
@@ -252,8 +254,8 @@ def extract_cfi(folder, file, initial_sampling_rate, end_of_meal, stable_secs):
     plt.scatter((bite_indices + int(index_offset)) / downsampled_rate, cfi_raw[bite_indices + int(index_offset)], label = 'Detected bites', c = 'tab:orange')
     plt.legend()
     plt.savefig(folder + "/pics/" + file +".png")
-    plt.show()
-    #plt.close(file)
+    #plt.show()
+    plt.close(file)
 
 
     #results = np.array([a, b, total_food_intake, average_food_intake_rate, average_bite_size, bite_size_STD, bite_frequency])
@@ -264,4 +266,4 @@ def extract_cfi(folder, file, initial_sampling_rate, end_of_meal, stable_secs):
 
 if __name__=="__main__":
     #extract_cfi("clemson_data", 'p011_c1', 15, True, 1)
-    extract_cfi("data_katerinas", str(1), 10, True, 1)
+    extract_cfi("data_katerinas", str(2), 10, True, 1)
